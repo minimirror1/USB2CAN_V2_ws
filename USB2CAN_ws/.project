@@ -31,6 +31,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>Component/CP_CAN_Driver</name>
+			<type>2</type>
+			<locationURI>PARENT-4-PROJECT_LOC/component/CP_CAN_Driver</locationURI>
+		</link>
+		<link>
 			<name>Component/CP_Delay</name>
 			<type>2</type>
 			<locationURI>PARENT-4-PROJECT_LOC/component/CP_Delay</locationURI>

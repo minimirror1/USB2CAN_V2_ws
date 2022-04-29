@@ -21,7 +21,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+/* Component Includes*/
 #include "cp_delay.h"
+#include "cp_can_driver.h"
+#include "cp_can_datalink.h"
+#include "cp_can_network.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,12 +60,12 @@ static void MX_CAN1_Init(void);
 static void MX_CAN2_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+static void CM_CAN1_Driver_Init(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+extern CP_CAN_ManagerHandleTypeDef cpCanManager;//test
 /* USER CODE END 0 */
 
 /**
@@ -96,7 +101,33 @@ int main(void)
   MX_CAN2_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  CM_CAN1_Driver_Init();
 
+
+  uint32_t ExtId = 0;
+  NET_MOTIONIST_HeaderParserTypeDef *pNetHeader = (NET_MOTIONIST_HeaderParserTypeDef *)&ExtId;
+  pNetHeader->b.tarid_base = 0;
+  uint8_t data[27] = {0,};
+
+  for(int i = 0; i < 27 ; i ++)
+  {
+	  data[i] = i;
+  }
+  //NET_MOTIONIST_DataHeaderParserTypeDef *pNetDHeader = (NET_MOTIONIST_DataHeaderParserTypeDef *)&data[0];
+
+  //pNetDHeader->b.tarid_sub = 30;
+
+  NET_MOTIONIST_TX_PacketInfoTypeDef txPacket;
+  txPacket.tarid_base = 5;
+  txPacket.tarid_sub = 1;
+  txPacket.ackEn = 1;
+  txPacket.cmd = 50;
+  txPacket.len = sizeof(data);
+  txPacket.pData = data;
+
+  CP_NET_TX_AddPacket(&hcan1, &txPacket);
+
+  uint32_t t_txT = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -106,10 +137,16 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  if(CP_NonStopDelay(&t_run, 500))
+	  if(CP_Delay_NonStop(&t_run, 500))
 	  {
 		  HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
+
+		  //CP_CAN_SendAddQueue_ExtData(&cpCanManager.list[0].cpCan, ExtId, data, 8);
+
 	  }
+
+	  CP_CAN_Process();
+
   }
   /* USER CODE END 3 */
 }
@@ -288,6 +325,9 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_RUN_GPIO_Port, LED_RUN_Pin, GPIO_PIN_SET);
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, LED_CAN1_RX_Pin|LED_CAN1_TX_Pin, GPIO_PIN_RESET);
+
   /*Configure GPIO pin : LED_ERR_Pin */
   GPIO_InitStruct.Pin = LED_ERR_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -295,16 +335,56 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LED_ERR_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : LED_RUN_Pin */
-  GPIO_InitStruct.Pin = LED_RUN_Pin;
+  /*Configure GPIO pins : LED_RUN_Pin LED_CAN1_RX_Pin LED_CAN1_TX_Pin */
+  GPIO_InitStruct.Pin = LED_RUN_Pin|LED_CAN1_RX_Pin|LED_CAN1_TX_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_RUN_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 4 */
+static void CM_NET_Motionist_Init(void)
+{
+	NET_MOTIONIST_InitTypeDef NET_InitStruct = {0,};
+
+	/* Configure HAL CAN Handle */
+	NET_InitStruct.hcan = &hcan1;
+
+	/* Configure ID */
+	NET_InitStruct.myID_base = 1;
+	NET_InitStruct.myID_sub = 1;
+
+	if (CP_NET_MOTIONIST_Init(&NET_InitStruct) != HAL_OK)
+	{
+		Error_Handler();
+	}
+
+}
+static void CM_CAN1_Driver_Init(void)
+{
+	CP_CAN_InitTypeDef CP_CAN_InitStruct = {0,};
+
+	/*Configure HAL CAN Handle */
+	CP_CAN_InitStruct.hcan = &hcan1;
+
+	/*Configure Tx LED GPIO pin */
+	CP_CAN_InitStruct.txLed.f_active = CP_CAN_LED_ENABLE;
+	CP_CAN_InitStruct.txLed.GPIO_Port = LED_CAN1_TX_GPIO_Port;
+	CP_CAN_InitStruct.txLed.Pin = LED_CAN1_TX_Pin;
+	CP_CAN_InitStruct.txLed.onStatus = GPIO_PIN_RESET;
+
+	/*Configure Rx LED GPIO pin */
+	CP_CAN_InitStruct.rxLed.f_active = CP_CAN_LED_ENABLE;
+	CP_CAN_InitStruct.rxLed.GPIO_Port = LED_CAN1_RX_GPIO_Port;
+	CP_CAN_InitStruct.rxLed.Pin = LED_CAN1_RX_Pin;
+	CP_CAN_InitStruct.rxLed.onStatus = GPIO_PIN_RESET;
+
+	CP_CAN_Driver_Init(&CP_CAN_InitStruct);
+
+	CM_NET_Motionist_Init();
+}
 
 /* USER CODE END 4 */
 
