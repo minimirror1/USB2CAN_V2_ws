@@ -26,6 +26,7 @@
 #include "cp_can_driver.h"
 #include "cp_can_datalink.h"
 #include "cp_can_network.h"
+#include "cp_crc_ccitt.h"
 
 /* USER CODE END Includes */
 
@@ -66,6 +67,7 @@ static void CM_CAN1_Driver_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 extern CP_CAN_ManagerHandleTypeDef cpCanManager;//test
+uint8_t data[64] = {0,};
 /* USER CODE END 0 */
 
 /**
@@ -107,9 +109,9 @@ int main(void)
   uint32_t ExtId = 0;
   NET_MOTIONIST_HeaderParserTypeDef *pNetHeader = (NET_MOTIONIST_HeaderParserTypeDef *)&ExtId;
   pNetHeader->b.tarid_base = 0;
-  uint8_t data[27] = {0,};
 
-  for(int i = 0; i < 27 ; i ++)
+
+  for(int i = 0; i < 64 ; i ++)
   {
 	  data[i] = i;
   }
@@ -128,6 +130,11 @@ int main(void)
   CP_NET_TX_AddPacket(&hcan1, &txPacket);
 
   uint32_t t_txT = 0;
+
+
+  //crc test
+  //uint16_t crc = CP_CRC_CCITT_Calc(data, 60);
+  //volatile uint16_t res = CP_CRC_CCITT_Check(data, 60, crc);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -223,7 +230,7 @@ static void MX_CAN1_Init(void)
   hcan1.Init.AutoWakeUp = DISABLE;
   hcan1.Init.AutoRetransmission = DISABLE;
   hcan1.Init.ReceiveFifoLocked = DISABLE;
-  hcan1.Init.TransmitFifoPriority = DISABLE;
+  hcan1.Init.TransmitFifoPriority = ENABLE;
   if (HAL_CAN_Init(&hcan1) != HAL_OK)
   {
     Error_Handler();
@@ -260,7 +267,7 @@ static void MX_CAN2_Init(void)
   hcan2.Init.AutoWakeUp = DISABLE;
   hcan2.Init.AutoRetransmission = DISABLE;
   hcan2.Init.ReceiveFifoLocked = DISABLE;
-  hcan2.Init.TransmitFifoPriority = DISABLE;
+  hcan2.Init.TransmitFifoPriority = ENABLE;
   if (HAL_CAN_Init(&hcan2) != HAL_OK)
   {
     Error_Handler();
