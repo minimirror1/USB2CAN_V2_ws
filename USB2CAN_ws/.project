@@ -45,5 +45,15 @@
 			<type>2</type>
 			<locationURI>PARENT-4-PROJECT_LOC/component/CP_Delay</locationURI>
 		</link>
+		<link>
+			<name>Component/CP_UART_Driver</name>
+			<type>2</type>
+			<locationURI>PARENT-4-PROJECT_LOC/component/CP_UART_Driver</locationURI>
+		</link>
+		<link>
+			<name>Component/CP_UART_Protocol</name>
+			<type>2</type>
+			<locationURI>PARENT-4-PROJECT_LOC/component/CP_UART_Protocol</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>

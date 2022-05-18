@@ -35,6 +35,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/USB2CAN_ws/Component/CP_Delay/Inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/USB2CAN_ws/Component/CP_CAN_Driver/Inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/USB2CAN_ws/Component/CP_CRC/Inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/USB2CAN_ws/Component/CP_UART_Protocol/Inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/USB2CAN_ws/Component/CP_UART_Driver/Inc}&quot;"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.assembler.input.797121802" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.assembler.input"/>
 							</tool>
@@ -55,6 +57,8 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/USB2CAN_ws/Component/CP_Delay/Inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/USB2CAN_ws/Component/CP_CAN_Driver/Inc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/USB2CAN_ws/Component/CP_CRC/Inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/USB2CAN_ws/Component/CP_UART_Protocol/Inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/USB2CAN_ws/Component/CP_UART_Driver/Inc}&quot;"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.595716931" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>

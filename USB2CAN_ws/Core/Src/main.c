@@ -28,6 +28,8 @@
 #include "cp_can_network.h"
 #include "cp_crc_ccitt.h"
 
+#include "cp_uart_driver.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,6 +64,7 @@ static void MX_CAN2_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 static void CM_CAN1_Driver_Init(void);
+static void CM_UART2_Driver_Init(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -104,7 +107,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   CM_CAN1_Driver_Init();
-
+  CM_UART2_Driver_Init();
 
   uint32_t ExtId = 0;
   NET_MOTIONIST_HeaderParserTypeDef *pNetHeader = (NET_MOTIONIST_HeaderParserTypeDef *)&ExtId;
@@ -135,6 +138,8 @@ int main(void)
   //crc test
   //uint16_t crc = CP_CRC_CCITT_Calc(data, 60);
   //volatile uint16_t res = CP_CRC_CCITT_Check(data, 60, crc);
+
+  uint8_t str[] = "hello world!";
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -149,7 +154,8 @@ int main(void)
 		  HAL_GPIO_TogglePin(LED_RUN_GPIO_Port, LED_RUN_Pin);
 
 		  //CP_CAN_SendAddQueue_ExtData(&cpCanManager.list[0].cpCan, ExtId, data, 8);
-
+		  //HAL_UART_Transmit_IT(&huart2, str, sizeof(str));
+		  CP_UART_SendString(USART2, (char)str);
 	  }
 
 	  CP_CAN_Process();
@@ -393,6 +399,29 @@ static void CM_CAN1_Driver_Init(void)
 	CM_NET_Motionist_Init();
 }
 
+void CM_UART2_Driver_Init(void)
+{
+	CP_UART_InitTypeDef cpUartInitStruct = {0,};
+
+	cpUartInitStruct.huart = &huart2;
+
+	cpUartInitStruct.UART_IRQn = USART2_IRQn;
+
+	/* tx led gpio */
+	cpUartInitStruct.txLed.active = CP_UART_ALT_GPIO_ENABLE;
+	cpUartInitStruct.txLed.GPIO_Port = LED_UART1_TX_GPIO_Port;
+	cpUartInitStruct.txLed.Pin = LED_UART1_TX_Pin;
+	cpUartInitStruct.txLed.onStatus = GPIO_PIN_RESET;
+
+	/* rx led gpio */
+	cpUartInitStruct.rxLed.active = CP_UART_ALT_GPIO_ENABLE;
+	cpUartInitStruct.rxLed.GPIO_Port = LED_UART1_RX_GPIO_Port;
+	cpUartInitStruct.rxLed.Pin = LED_UART1_RX_Pin;
+	cpUartInitStruct.rxLed.onStatus = GPIO_PIN_RESET;
+
+	CP_UART_Init(&cpUartInitStruct);
+
+}
 /* USER CODE END 4 */
 
 /**
