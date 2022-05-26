@@ -29,6 +29,7 @@
 #include "cp_crc_ccitt.h"
 
 #include "cp_uart_driver.h"
+#include "cp_uart_datalink.h"
 
 /* USER CODE END Includes */
 
@@ -47,7 +48,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
- CAN_HandleTypeDef hcan1;
+CAN_HandleTypeDef hcan1;
 CAN_HandleTypeDef hcan2;
 
 UART_HandleTypeDef huart2;
@@ -155,11 +156,11 @@ int main(void)
 
 		  //CP_CAN_SendAddQueue_ExtData(&cpCanManager.list[0].cpCan, ExtId, data, 8);
 		  //HAL_UART_Transmit_IT(&huart2, str, sizeof(str));
-		  CP_UART_SendString(USART2, (char)str);
+		  //CP_UART_SendString(USART2, (char *)str);
 	  }
 
 	  CP_CAN_Process();
-
+	  CP_UART_Protocol_Process();
   }
   /* USER CODE END 3 */
 }
@@ -331,6 +332,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LED_ERR_GPIO_Port, LED_ERR_Pin, GPIO_PIN_SET);
@@ -340,6 +342,12 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, LED_CAN1_RX_Pin|LED_CAN1_TX_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED_UART1_RX_GPIO_Port, LED_UART1_RX_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LED_UART1_TX_GPIO_Port, LED_UART1_TX_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : LED_ERR_Pin */
   GPIO_InitStruct.Pin = LED_ERR_Pin;
@@ -354,6 +362,20 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LED_UART1_RX_Pin */
+  GPIO_InitStruct.Pin = LED_UART1_RX_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED_UART1_RX_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : LED_UART1_TX_Pin */
+  GPIO_InitStruct.Pin = LED_UART1_TX_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(LED_UART1_TX_GPIO_Port, &GPIO_InitStruct);
 
 }
 
@@ -420,6 +442,11 @@ void CM_UART2_Driver_Init(void)
 	cpUartInitStruct.rxLed.onStatus = GPIO_PIN_RESET;
 
 	CP_UART_Init(&cpUartInitStruct);
+
+	/* uart packet protocol */
+	UART_Protocol_InitTypeDef uartProtocolInit;
+	uartProtocolInit.huart = &huart2;
+	CP_UART_Protocol_Init(&uartProtocolInit);
 
 }
 /* USER CODE END 4 */

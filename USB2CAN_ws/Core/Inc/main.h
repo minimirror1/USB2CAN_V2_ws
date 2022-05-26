@@ -65,8 +65,12 @@ void Error_Handler(void);
 #define LED_CAN1_RX_GPIO_Port GPIOC
 #define LED_CAN1_TX_Pin GPIO_PIN_12
 #define LED_CAN1_TX_GPIO_Port GPIOC
+#define LED_UART1_RX_Pin GPIO_PIN_2
+#define LED_UART1_RX_GPIO_Port GPIOD
+#define LED_UART1_TX_Pin GPIO_PIN_3
+#define LED_UART1_TX_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-
+#define DEVICE_TYPE_CAN2UART
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
